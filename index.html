@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>VÉRTICE: Sobrevivência Neon</title>
+  <meta name="description" content="Um jogo arcade casual de sobrevivência em tela única, com alto ritmo, sistema de risco e recompensa e jogabilidade viciante.">
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="cyber-grid-overlay"></div>
+
+  <div id="game-wrapper">
+    <!-- Top Minimalist HUD -->
+    <header id="hud" class="hud-container">
+      <div class="hud-block hud-score-block">
+        <span class="hud-label">PONTUAÇÃO</span>
+        <span id="hud-score" class="hud-value neon-glow">0</span>
+      </div>
+
+      <div class="hud-block hud-multiplier-block">
+        <div class="multiplier-header">
+          <span class="hud-label">MULTIPLICADOR</span>
+          <span id="hud-mult-val" class="mult-badge">1.0x</span>
+        </div>
+        <div class="meter-track">
+          <div id="mult-meter-fill" class="meter-fill"></div>
+        </div>
+      </div>
+
+      <div class="hud-block hud-record-block">
+        <span class="hud-label">RECORDE</span>
+        <span id="hud-best" class="hud-value hud-value-muted">0</span>
+      </div>
+
+      <!-- Quick sound & pause controls -->
+      <div class="hud-actions">
+        <button id="btn-sound" class="icon-btn" title="Alternar Som (M)" aria-label="Som">
+          <span id="sound-icon">🔊</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Game Canvas Container -->
+    <main id="canvas-container">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- Dynamic Event Alert Banner -->
+      <div id="event-banner" class="event-banner hidden">
+        <div class="banner-icon">⚡</div>
+        <div class="banner-content">
+          <h3 id="banner-title">SOBRECARGA NEON</h3>
+          <p id="banner-subtitle">Mais velocidade! Pontos dobrados!</p>
+        </div>
+      </div>
+
+      <!-- Floating On-Screen Controls Hint for New Players (Fades after start) -->
+      <div id="tutorial-overlay" class="tutorial-overlay">
+        <div class="tutorial-content">
+          <div class="pulse-ring-indicator"></div>
+          <div class="tutorial-badge">COMO JOGAR</div>
+          <h2 class="tutorial-title">MOVA, DESVIE & COLETE</h2>
+          <p class="tutorial-desc">
+            Use o <strong>Mouse</strong>, <strong>WASD / Setas</strong> ou <strong>Toque</strong>.<br>
+            Passe <em>bem perto</em> dos perigos para ativar <strong>QUASE (GRAZE)</strong> e acelerar o multiplicador!
+          </p>
+          <div class="key-hints">
+            <span class="key-tag">Mouse / Toque</span>
+            <span class="key-tag">W A S D</span>
+            <span class="key-tag">Espaço para Iniciar</span>
+          </div>
+          <button id="btn-start" class="btn-primary glow-button">
+            INICIAR PARTIDA
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Pause Overlay -->
+      <div id="pause-overlay" class="modal-overlay hidden">
+        <div class="modal-card">
+          <h2>JOGO PAUSADO</h2>
+          <p>Pressione <kbd>ESC</kbd> ou <kbd>P</kbd> para continuar</p>
+          <button id="btn-resume" class="btn-primary">CONTINUAR</button>
+        </div>
+      </div>
+
+      <!-- Game Over Overlay (Instant Feedback, Zero Fluff) -->
+      <div id="gameover-overlay" class="modal-overlay hidden">
+        <div class="modal-card gameover-card">
+          <div id="new-record-badge" class="new-record-tag hidden">NOVO RECORDE PESSOAL! 🏆</div>
+          
+          <h2 class="gameover-title">FIM DE PARTIDA</h2>
+          
+          <div class="stats-grid">
+            <div class="stat-box">
+              <span class="stat-label">PONTOS</span>
+              <span id="final-score" class="stat-value neon-glow">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">TEMPO</span>
+              <span id="final-time" class="stat-value">00:00</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">MAX MULTI</span>
+              <span id="final-multi" class="stat-value">1.0x</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">GRAZES</span>
+              <span id="final-grazes" class="stat-value">0</span>
+            </div>
+          </div>
+
+          <!-- Micro unlock notification if reached -->
+          <div id="unlock-alert" class="unlock-alert hidden">
+            <span class="unlock-icon">✨</span>
+            <span id="unlock-text">Nova Skin Desbloqueada!</span>
+          </div>
+
+          <!-- Quick Skin Selector -->
+          <div class="skins-container">
+            <span class="skin-selector-label">SKIN DO NÚCLEO:</span>
+            <div id="skin-list" class="skin-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Instant Replay CTA -->
+          <div class="gameover-actions">
+            <button id="btn-restart" class="btn-primary glow-button btn-large">
+              <span>JOGAR NOVAMENTE</span>
+              <span class="key-shortcut">[ Espaço / Enter ]</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Bottom Status Bar -->
+    <footer id="footer-status">
+      <div class="status-tip">
+        <span class="tip-highlight">💡 Dica:</span>
+        <span id="random-tip">Chegar perto de obstáculos dá bônus de Quase (Graze) e aumenta seu multiplicador rapidamente!</span>
+      </div>
+      <div class="status-stats">
+        <span>Gemas Totais: <strong id="total-gems">0</strong></span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Audio and Game Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/hazards.js"></script>
+  <script src="js/items.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
